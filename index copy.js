@@ -8,7 +8,10 @@ var app = express();
 
 var PORT = 8080;
 
+var array = [];
 
+const notes = require('./db/db.json');
+app.use(express.json())
 app.use(express.static(path.join(__dirname + "/public")))
 
 
@@ -44,7 +47,52 @@ app.get("/",(req, res) =>{
       });
 });
 
+app.get("/api/notes", (req, res) => {
+  res.json(notes);
 
+});
+
+app.delete('/api/notes/:id', (req, res) => {
+  //compare req.params.id to the ids in notes
+  //if else statement that removes the object from the array in the else statement
+  //use splice
+  for(var i = 0; req.params.id > i; i++){
+    if(err)throw err;
+    array.splice(notes.id, 1)
+  }
+  console.log('delete');
+  
+  console.log(req.params);
+      res.status(200).json({
+        message: 'Deleted!'
+      })
+  .catch(
+    (error) => {
+      res.status(400).json({
+        error: error
+      });
+    }
+  );
+});
+
+app.post('/api/notes', (req, res) => {
+  
+  const newNote = req.body;
+  console.log(req.body)
+  
+  array.concat(notes)
+  array.push(newNote);
+  console.log(array);
+ 
+  console.log(JSON.stringify(array))
+
+  
+  fs.writeFile('./db/db.json', JSON.stringify(array), function(err){
+    if(err) throw err;
+
+  });
+  res.json(req.body)
+});
 
 // Starts our server.
 app.listen(PORT, function() {

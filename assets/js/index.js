@@ -89,7 +89,6 @@ app.post('/api/notes', (req, res) => {
   
   fs.writeFile('./db/db.json', JSON.stringify(array), function(err){
     if(err) throw err;
-
   });
   res.json(req.body)
 });

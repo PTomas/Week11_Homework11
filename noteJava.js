@@ -56,13 +56,13 @@ app.delete('/api/notes/:id', (req, res) => {
   //compare req.params.id to the ids in notes
   //if else statement that removes the object from the array in the else statement
   //use splice
-  const userIndex = getUserIndex(req.params.userId)
+  const userIndex = getUserIndex(req.params.id)
 
   if (userIndex === -1) return res.status(404).json({})
 
-  users.splice(userIndex, 1)
-  res.json(users)
-  
+  array.splice(userIndex, 1)
+  res.json(array)
+
   console.log('delete');
   
   console.log(req.params);

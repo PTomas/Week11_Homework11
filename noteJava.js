@@ -10,9 +10,16 @@ var PORT = 8080;
 
 var array = [];
 
+
 const notes = require('./db/db.json');
 app.use(express.json())
 app.use(express.static(path.join(__dirname + "/public")))
+
+// possibility of a collison 
+// generate two of the same id is 1/100000
+function rand(){
+  return Math.floor(Math.random() * 1000000)
+}
 
 
 app.get("/",(req, res) =>{
@@ -48,7 +55,8 @@ app.get("/",(req, res) =>{
 });
 
 app.get("/api/notes", (req, res) => {
-  res.json(notes);
+  let data = fs.readFileSync( __dirname + '/db/db.json', 'utf8')
+  res.json(data);
 
 });
 
@@ -56,45 +64,30 @@ app.delete('/api/notes/:id', (req, res) => {
   //compare req.params.id to the ids in notes
   //if else statement that removes the object from the array in the else statement
   //use splice
-  const userIndex = getUserIndex(req.params.id)
-
-  if (userIndex === -1) return res.status(404).json({})
-
-  array.splice(userIndex, 1)
-  res.json(array)
-
-  console.log('delete');
   
-  console.log(req.params);
-      res.status(200).json({
-        message: 'Deleted!'
-      })
-  .catch(
-    (error) => {
-      res.status(400).json({
-        error: error
-      });
-    }
-  );
+  let data = JSON.parse( fs.readFileSync( __dirname + "/db/db.json", 'utf8'))
+  
+  let newData = data.filter( note => note.id != req.params.id )
+
+  fs.writeFile('./db/db.json', JSON.stringify(newData), function(err){
+    if(err) throw err;
+    res.json(newData)
+  });
+  
 });
 
 app.post('/api/notes', (req, res) => {
   
   const newNote = req.body;
-  console.log(req.body)
-  
-  array.concat(notes)
-  array.push(newNote);
-  console.log(array);
- 
-  console.log(JSON.stringify(array))
+  newNote.id = rand() // gnerate random id 
 
-  
-  fs.writeFile('./db/db.json', JSON.stringify(array), function(err){
+  let data = JSON.parse( fs.readFileSync( __dirname + '/db/db.json', 'utf8'))
+  data.push(newNote)
+  fs.writeFile('./db/db.json', JSON.stringify(data), function(err){
     if(err) throw err;
-
+    res.json(data)
   });
-  res.json(req.body)
+  
 });
 
 // Starts our server.

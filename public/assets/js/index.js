@@ -20,7 +20,10 @@ const saveNote = (note) => {
   console.log(note,"note")
   return $.ajax({
     url: "/api/notes",
-    data: note,
+    data: JSON.stringify(note),
+    headers : {
+      'Content-Type' : "application/json"
+    },
     method: "POST",
   });
 };
@@ -105,6 +108,7 @@ const handleRenderSaveBtn = function () {
 
 // Render's the list of note titles
 const renderNoteList = (notes) => {
+  console.log("note list is", notes)
   $noteList.empty();
 
   const noteListItems = [];
@@ -139,7 +143,10 @@ const renderNoteList = (notes) => {
 
 // Gets notes from the db and renders them to the sidebar
 const getAndRenderNotes = () => {
-  return getNotes().then(renderNoteList);
+  return getNotes().done( (data) => {
+    console.log(JSON.parse(data) )  
+    renderNoteList(JSON.parse(data))
+  });
 };
 
 $saveNoteBtn.on("click", handleNoteSave);
